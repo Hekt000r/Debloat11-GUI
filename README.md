@@ -8,10 +8,13 @@ Free your Windows 11 OS from bloatware and AI slop
 Using this application is incredibly simple.
 The only suggestion is that you fully update windows (or pause updates) before running the program so an update doesn't start after restarting to finish the script
 
-Download the latest version from the (latest release)
+Download the latest version from the [latest release](https://github.com/Hekt000r/Debloat11-GUI/releases)
+
 Launch as administrator and just click next till the process starts
 
 Antivirus WARNING: Antiviruses will sometimes flag this program as malware, which is a false-positive. The project is open source and you can build it yourself if you like.
+
+
 NOTE: Do not worry if you see a warning, windows installations differ so if something fails it's probably already removed
 
 ## Features
