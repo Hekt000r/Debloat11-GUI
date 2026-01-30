@@ -352,21 +352,108 @@ function Invoke-Debloat {
         # Disable Activity History
         &$regFix "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "EnableActivityFeed" 0
 
-        # --- EDGE DEBLOATING (DuckDuckGo & Optimization) ---
-        Internal-Log "Action: Debloating Microsoft Edge..."
+
+        # --- EDGE DEBLOATING (Ultra-Aggressive Edge-Debloat Policies) ---
+        Internal-Log "Action: Applying Ultra-Aggressive Edge Policies..."
+        
         $edgeKey = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
+        
+        # 1. Search & Homepage (DuckDuckGo + Hardening)
         &$regFix $edgeKey "DefaultSearchProviderEnabled" 1
-        &$regFix $edgeKey "DefaultSearchProviderName" "DuckDuckGo"
-        &$regFix $edgeKey "DefaultSearchProviderSearchURL" "https://duckduckgo.com/?q={searchTerms}"
+        &$regFix $edgeKey "DefaultSearchProviderName" "DuckDuckGo" "String"
+        &$regFix $edgeKey "DefaultSearchProviderSearchURL" "https://duckduckgo.com/?q={searchTerms}" "String"
+        &$regFix $edgeKey "DefaultSearchProviderKeyword" "ddg" "String"
+        &$regFix $edgeKey "DefaultSearchProviderSuggestURL" "https://duckduckgo.com/ac/?q={searchTerms}" "String"
         &$regFix $edgeKey "HomepageLocation" "https://duckduckgo.com" "String"
-        &$regFix $edgeKey "RestoreOnStartup" 4 # Open a list of URLs
+        &$regFix $edgeKey "RestoreOnStartup" 4
         &$regFix $edgeKey "RestoreOnStartupURLs" "https://duckduckgo.com" "String"
-        &$regFix $edgeKey "HideFirstRunExperience" 1
+        &$regFix $edgeKey "NewTabPageLocation" "https://duckduckgo.com" "String"
+        &$regFix $edgeKey "NewTabPageSearchBox" "redirect" "String"
+        
+        # 2. Privacy & Telemetry Hardening
+        &$regFix $edgeKey "MetricsReportingEnabled" 0
+        &$regFix $edgeKey "PersonalizationReportingEnabled" 0
+        &$regFix $edgeKey "DiagnosticData" 0
+        &$regFix $edgeKey "Edge3PSerpTelemetryEnabled" 0
+        &$regFix $edgeKey "ExperimentationAndConfigurationServiceControl" 0
+        &$regFix $edgeKey "SearchSuggestEnabled" 0
+        &$regFix $edgeKey "TrackingPrevention" 3
+        &$regFix $edgeKey "ConfigureDoNotTrack" 1
+        &$regFix $edgeKey "AlternateErrorPagesEnabled" 0
+        &$regFix $edgeKey "ResolveNavigationErrorsUseWebService" 0
+        
+        # 3. Features & Sidebar Disabling
+        &$regFix $edgeKey "HubsSidebarEnabled" 0
+        &$regFix $edgeKey "SearchInSidebarEnabled" 2 # 2 = Disabled
+        &$regFix $edgeKey "StandaloneHubsSidebarEnabled" 0
         &$regFix $edgeKey "EdgeCollectionsEnabled" 0
-        &$regFix $edgeKey "DiscoverPageContextEnabled" 0
-        &$regFix $edgeKey "HubsSidebarEnabled" 0 # Removes Copilot sidebar
-        &$regFix $edgeKey "MetricsReportingEnabled" 0 # Disable Telemetry
-        &$regFix $edgeKey "PersonalizationReportingEnabled" 0 # Disable Data Collection
+        &$regFix $edgeKey "ShoppingListEnabled" 0
+        &$regFix $edgeKey "EdgeShoppingAssistantEnabled" 0
+        &$regFix $edgeKey "ShowMicrosoftRewards" 0
+        &$regFix $edgeKey "WalletDonationEnabled" 0
+        &$regFix $edgeKey "EdgeWalletCheckoutEnabled" 0
+        &$regFix $edgeKey "EdgeWorkspacesEnabled" 0
+        &$regFix $edgeKey "SplitScreenEnabled" 0
+        &$regFix $edgeKey "TabServicesEnabled" 0
+        &$regFix $edgeKey "TranslateEnabled" 0
+        &$regFix $edgeKey "QuickViewOfficeFilesEnabled" 0
+        &$regFix $edgeKey "ReadAloudEnabled" 0
+        &$regFix $edgeKey "LiveCaptionsAllowed" 0
+        &$regFix $edgeKey "SpeechRecognitionEnabled" 0
+        &$regFix $edgeKey "AccessibilityImageLabelsEnabled" 0
+        
+        # 4. AI & Copilot Elements
+        &$regFix $edgeKey "CopilotPageContext" 0
+        &$regFix $edgeKey "CopilotPageContextEnabled" 0
+        &$regFix $edgeKey "EdgeEntraCopilotPageContext" 0
+        &$regFix $edgeKey "Microsoft365CopilotChatIconEnabled" 0
+        &$regFix $edgeKey "NewTabPageBingChatEnabled" 0
+        &$regFix $edgeKey "ShareBrowsingHistoryWithCopilotSearchAllowed" 0
+        &$regFix $edgeKey "ComposeInlineEnabled" 0
+        &$regFix $edgeKey "AIGenThemesEnabled" 0
+        &$regFix $edgeKey "BuiltInAIAPIsEnabled" 0
+        &$regFix $edgeKey "EdgeHistoryAISearchEnabled" 0
+        &$regFix $edgeKey "GenAILocalFoundationalModelSettings" 1
+        
+        # 5. UI & Nags
+        &$regFix $edgeKey "HideFirstRunExperience" 1
+        &$regFix $edgeKey "ShowHomeButton" 0
+        &$regFix $edgeKey "FavoritesBarEnabled" 0
+        &$regFix $edgeKey "PinBrowserEssentialsToolbarButton" 0
+        &$regFix $edgeKey "PromotionalTabsEnabled" 0
+        &$regFix $edgeKey "MicrosoftEdgeInsiderPromotionEnabled" 0
+        &$regFix $edgeKey "DefaultBrowserSettingsCampaignEnabled" 0
+        &$regFix $edgeKey "ShowPDFDefaultRecommendationsEnabled" 0
+        &$regFix $edgeKey "SpotlightExperiencesAndRecommendationsEnabled" 0
+        &$regFix $edgeKey "StartupBoostEnabled" 0
+        &$regFix $edgeKey "BackgroundModeEnabled" 0
+        
+        # 6. Safety & Network
+        &$regFix $edgeKey "HttpsOnlyMode" "force_enabled" "String"
+        &$regFix $edgeKey "SafeBrowsingSurveysEnabled" 0
+        &$regFix $edgeKey "TyposquattingCheckerEnabled" 0
+        &$regFix $edgeKey "BuiltInDnsClientEnabled" 0
+        
+        # 7. User Path (Immediate Effect)
+        $edgeKeyHKCU = "HKCU:\Software\Policies\Microsoft\Edge"
+        &$regFix $edgeKeyHKCU "DefaultSearchProviderEnabled" 1
+        &$regFix $edgeKeyHKCU "DefaultSearchProviderName" "DuckDuckGo" "String"
+        &$regFix $edgeKeyHKCU "DefaultSearchProviderSearchURL" "https://duckduckgo.com/?q={searchTerms}" "String"
+        &$regFix $edgeKeyHKCU "HideFirstRunExperience" 1
+        
+        # Layer 4: Disable Edge Update Services
+        $edgeServices = @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationService")
+        foreach ($svc in $edgeServices) {
+            if (Get-Service -Name $svc -ErrorAction SilentlyContinue) {
+                Internal-Log "Action: Disabling Edge service: $svc"
+                Stop-Service -Name $svc -Force -ErrorAction SilentlyContinue
+                Set-Service -Name $svc -StartupType Disabled -ErrorAction SilentlyContinue
+            }
+        }
+        
+        # Layer 5: Force Group Policy Refresh
+        Internal-Log "Action: Forcing Group Policy refresh..."
+        Start-Process -FilePath "gpupdate.exe" -ArgumentList "/force", "/wait:0" -WindowStyle Hidden -Wait -ErrorAction SilentlyContinue
         
         # --- ROBUST AI & COPILOT REMOVAL ---
         Internal-Log "Action: Disabling Copilot and AI elements..."
