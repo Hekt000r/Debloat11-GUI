@@ -114,7 +114,8 @@ $xaml = @"
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     $response = [System.Windows.MessageBox]::Show("This script requires Administrator privileges to perform debloating. Do you want to restart as Admin?", "Admin Required", "YesNo", "Warning")
     if ($response -eq 'Yes') {
-        Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+        # The -Wait is CRITICAL for IExpress builds to prevent temp folder cleanup
+        Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs -Wait
     }
     exit
 }
@@ -252,7 +253,8 @@ function Invoke-Debloat {
             "Microsoft.QuickAssist", "Microsoft.ParentalControls",
             "Microsoft.VP9VideoExtensions", "Microsoft.WebMediaExtensions", "Microsoft.HEIFImageExtension", 
             "Microsoft.RawImageExtension", "Microsoft.Paint", "Microsoft.Services.Store.Engagement", "Microsoft.AsyncTextService",
-            "MicrosoftWindows.Client.WebExperience" # Windows 11 Widgets
+            "MicrosoftWindows.Client.WebExperience", # Windows 11 Widgets
+            "Microsoft.Windows.Ai.Shell.Desktop", "Microsoft.Copilot" # AI & Copilot logic
         )
 
         $Capabilities = @(
@@ -349,6 +351,28 @@ function Invoke-Debloat {
         
         # Disable Activity History
         &$regFix "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "EnableActivityFeed" 0
+
+        # --- EDGE DEBLOATING (DuckDuckGo & Optimization) ---
+        Internal-Log "Action: Debloating Microsoft Edge..."
+        $edgeKey = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
+        &$regFix $edgeKey "DefaultSearchProviderEnabled" 1
+        &$regFix $edgeKey "DefaultSearchProviderName" "DuckDuckGo"
+        &$regFix $edgeKey "DefaultSearchProviderSearchURL" "https://duckduckgo.com/?q={searchTerms}"
+        &$regFix $edgeKey "HomepageLocation" "https://duckduckgo.com" "String"
+        &$regFix $edgeKey "RestoreOnStartup" 4 # Open a list of URLs
+        &$regFix $edgeKey "RestoreOnStartupURLs" "https://duckduckgo.com" "String"
+        &$regFix $edgeKey "HideFirstRunExperience" 1
+        &$regFix $edgeKey "EdgeCollectionsEnabled" 0
+        &$regFix $edgeKey "DiscoverPageContextEnabled" 0
+        &$regFix $edgeKey "HubsSidebarEnabled" 0 # Removes Copilot sidebar
+        &$regFix $edgeKey "MetricsReportingEnabled" 0 # Disable Telemetry
+        &$regFix $edgeKey "PersonalizationReportingEnabled" 0 # Disable Data Collection
+        
+        # --- ROBUST AI & COPILOT REMOVAL ---
+        Internal-Log "Action: Disabling Copilot and AI elements..."
+        &$regFix "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" "ShowCopilotButton" 0
+        &$regFix "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot" "TurnOffWindowsCopilot" 1
+        &$regFix "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "RemindMeAboutWindowsCopilot" 0
         
         # UI Hardening: Classic Context Menu
         if (-not (Test-Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32")) {
