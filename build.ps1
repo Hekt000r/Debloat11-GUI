@@ -1,8 +1,8 @@
 # Check for Administrator privileges
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Host "[ERROR] Administrator privileges required." -ForegroundColor Red
-    Write-Host "Please right-click and select 'Run as Administrator'."
-    Start-Sleep -Seconds 3
+    Write-Host "[INIT] Restarting as Administrator..." -ForegroundColor Yellow
+    # Restart the script with RunAs verb (Elevated)
+    Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
 }
 
