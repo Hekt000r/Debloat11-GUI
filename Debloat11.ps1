@@ -301,7 +301,7 @@ function Invoke-Debloat {
         }
 
         # 5. Service & Task Optimization
-        $Services = @("DiagTrack", "SysMain", "WpcMonService", "dmwappushservice", "OneSyncSvc", "MapsBroker", "lfsvc")
+        $Services = @("DiagTrack", "SysMain", "WpcMonService", "dmwappushservice", "MapsBroker", "lfsvc")
         foreach ($Svc in $Services) {
             if (Get-Service -Name $Svc -ErrorAction SilentlyContinue) {
                 Internal-Log "Action: Stopping Service $Svc"
@@ -351,6 +351,12 @@ function Invoke-Debloat {
         
         # Disable Activity History
         &$regFix "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "EnableActivityFeed" 0
+
+        # --- LONG-TERM UPDATE PAUSE (Unlocking Options) ---
+        Internal-Log "Action: Unlocking long-term update pause options..."
+        $updateKey = "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings"
+        
+        &$regFix $updateKey "FlightSettingsMaxPauseDays" 30000
 
 
         # --- EDGE DEBLOATING (Ultra-Aggressive Edge-Debloat Policies) ---
@@ -417,8 +423,8 @@ function Invoke-Debloat {
         
         # 5. UI & Nags
         &$regFix $edgeKey "HideFirstRunExperience" 1
-        &$regFix $edgeKey "ShowHomeButton" 0
-        &$regFix $edgeKey "FavoritesBarEnabled" 0
+        &$regFix $edgeKey "ShowHomeButton" 1
+        &$regFix $edgeKey "FavoritesBarEnabled" 1
         &$regFix $edgeKey "PinBrowserEssentialsToolbarButton" 0
         &$regFix $edgeKey "PromotionalTabsEnabled" 0
         &$regFix $edgeKey "MicrosoftEdgeInsiderPromotionEnabled" 0
@@ -427,6 +433,11 @@ function Invoke-Debloat {
         &$regFix $edgeKey "SpotlightExperiencesAndRecommendationsEnabled" 0
         &$regFix $edgeKey "StartupBoostEnabled" 0
         &$regFix $edgeKey "BackgroundModeEnabled" 0
+
+        # Account & Sync Restoration
+        &$regFix $edgeKey "BrowserSignin" 1
+        &$regFix $edgeKey "SyncDisabled" 0
+        &$regFix $edgeKey "ImplicitSigninEnabled" 1
         
         # 6. Safety & Network
         &$regFix $edgeKey "HttpsOnlyMode" "force_enabled" "String"
@@ -441,13 +452,13 @@ function Invoke-Debloat {
         &$regFix $edgeKeyHKCU "DefaultSearchProviderSearchURL" "https://duckduckgo.com/?q={searchTerms}" "String"
         &$regFix $edgeKeyHKCU "HideFirstRunExperience" 1
         
-        # Layer 4: Disable Edge Update Services
+        # Layer 4: Ensure Edge Update Services (Restricted for stability)
+        # We previously disabled these, but keeping them enabled (Manual) is safer for account sync components
         $edgeServices = @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationService")
         foreach ($svc in $edgeServices) {
             if (Get-Service -Name $svc -ErrorAction SilentlyContinue) {
-                Internal-Log "Action: Disabling Edge service: $svc"
-                Stop-Service -Name $svc -Force -ErrorAction SilentlyContinue
-                Set-Service -Name $svc -StartupType Disabled -ErrorAction SilentlyContinue
+                # Set to Manual instead of Disabled to allow Edge to function for sync
+                Set-Service -Name $svc -StartupType Manual -ErrorAction SilentlyContinue
             }
         }
         
