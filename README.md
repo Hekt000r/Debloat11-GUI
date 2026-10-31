@@ -1,4 +1,4 @@
-<img width="200" height="32" alt="logo-dark" src="https://github.com/user-attachments/assets/88e4379d-aab0-437d-9113-cfceb3a4260a" />
+<img width="200" height="32" alt="logo-dark" src="/assets/logo-dark.png" />
 
 Free your Windows 11 OS from bloatware and AI slop
 
