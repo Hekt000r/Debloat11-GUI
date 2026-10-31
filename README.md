@@ -1,5 +1,5 @@
 <p align="center">
-<img width="400" height="64" alt="logo-dark" src="/assets/logo-dark.png" />
+<img width="400" height="64" alt="logo-dark" src="/assets/logo-dark.svg" />
  <br/>
 Free your Windows 11 OS from bloatware and AI slop
 </p>
