@@ -2,7 +2,7 @@
 
 Free your Windows 11 OS from bloatware and AI slop
 
-<img width="332" height="442" alt="image" src="https://github.com/user-attachments/assets/b4eaa662-025b-4b00-b28a-edf074278fe0" />
+<img width="360" height="442" alt="image" src="https://github.com/user-attachments/assets/b4eaa662-025b-4b00-b28a-edf074278fe0" />
 
 ## How to use
 
