@@ -1,4 +1,5 @@
-# Debloat11
+<img width="200" height="32" alt="logo-dark" src="https://github.com/user-attachments/assets/88e4379d-aab0-437d-9113-cfceb3a4260a" />
+
 Free your Windows 11 OS from bloatware and AI slop
 
 <img width="332" height="442" alt="image" src="https://github.com/user-attachments/assets/b4eaa662-025b-4b00-b28a-edf074278fe0" />
